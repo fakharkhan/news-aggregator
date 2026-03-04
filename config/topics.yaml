@@ -1,0 +1,75 @@
+topics:
+  - IMF program
+  - energy prices
+  - CPEC
+  - inflation Pakistan
+  - AI regulation
+  - semiconductor supply chain
+
+categories:
+  International Affairs:
+    keywords:
+      - UN
+      - NATO
+      - ceasefire
+      - sanctions
+      - treaty
+  Regional:
+    keywords:
+      - South Asia
+      - Middle East
+      - Asia-Pacific
+      - Gulf
+  Pakistan (Local):
+    keywords:
+      - Pakistan
+      - Islamabad
+      - Lahore
+      - Karachi
+      - Sindh
+      - Punjab
+      - KP
+      - Balochistan
+  Geopolitics & Power Shifts:
+    keywords:
+      - strategic
+      - influence
+      - hegemony
+      - BRICS
+      - Quad
+      - AUKUS
+  Economy & Technology:
+    keywords:
+      - inflation
+      - GDP
+      - markets
+      - exports
+      - imports
+      - startup
+      - AI
+      - semiconductor
+      - fintech
+      - energy
+
+feeds:
+  - name: Reuters World
+    url: https://feeds.reuters.com/reuters/worldNews
+    category: International Affairs
+  - name: BBC World
+    url: http://feeds.bbci.co.uk/news/world/rss.xml
+    category: International Affairs
+  - name: Al Jazeera
+    url: https://www.aljazeera.com/xml/rss/all.xml
+    category: International Affairs
+  - name: Dawn Pakistan
+    url: https://www.dawn.com/feed
+    category: Pakistan (Local)
+  - name: The News Pakistan
+    url: https://www.thenews.com.pk/rss/1/1
+    category: Pakistan (Local)
+  - name: TechCrunch
+    url: https://techcrunch.com/feed/
+    category: Economy & Technology
+  - name: The Verge
+    url: https://www.theverge.com/rss/index.xml
+    category: Economy & Technology

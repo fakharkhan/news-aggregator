@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Personal Strategic News Intelligence</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #0b0f19; color: #e6e8ee; }
+    header { padding: 16px 24px; background: #101629; border-bottom: 1px solid #1c2440; position: sticky; top: 0; z-index: 1; }
+    header h1 { font-size: 18px; margin: 0; }
+    main { display: grid; grid-template-columns: 320px 1fr; gap: 0; min-height: calc(100vh - 64px); }
+    aside { border-right: 1px solid #1c2440; background: #0f1426; padding: 16px; }
+    .section { margin-bottom: 16px; }
+    .section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #9fb3ff; margin: 0 0 8px 0; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { padding: 6px 10px; border-radius: 999px; border: 1px solid #28335b; background: #0b1122; color: #c6d0f7; cursor: pointer; font-size: 12px; }
+    .chip.active { background: #1a2b6b; border-color: #3c57a9; }
+    .dates { max-height: 40vh; overflow: auto; border: 1px solid #1c2440; border-radius: 8px; }
+    .date-item { padding: 10px 12px; border-bottom: 1px solid #1c2440; cursor: pointer; }
+    .date-item:hover { background: #121a33; }
+    .date-item.active { background: #18224a; }
+    .content { padding: 20px 24px; }
+    .md h1, .md h2, .md h3 { color: #d6ddff; }
+    .md a { color: #7db8ff; }
+    .muted { color: #8da2d6; font-size: 12px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 960px) {
+      main { grid-template-columns: 1fr; }
+      aside { border-right: none; border-bottom: 1px solid #1c2440; }
+    }
+  </style>
+  <script>
+    const sections = [
+      "International Affairs",
+      "Regional",
+      "Pakistan (Local)",
+      "Geopolitics & Power Shifts",
+      "Economy & Technology",
+    ];
+    let manifest = null;
+    let activeSections = new Set(sections);
+    let selectedDate = null;
+
+    function renderChips() {
+      const container = document.getElementById('chips');
+      container.innerHTML = '';
+      sections.forEach(sec => {
+        const div = document.createElement('div');
+        div.className = 'chip' + (activeSections.has(sec) ? ' active' : '');
+        div.textContent = sec;
+        div.onclick = () => {
+          if (activeSections.has(sec)) activeSections.delete(sec); else activeSections.add(sec);
+          renderChips();
+          applyFilters();
+        };
+        container.appendChild(div);
+      });
+    }
+
+    async function loadManifest() {
+      const res = await fetch('daily/index.json', { cache: 'no-store' });
+      if (!res.ok) return;
+      manifest = await res.json();
+      renderDates();
+      if (manifest.days && manifest.days.length) selectDate(manifest.days[0].day);
+    }
+
+    function renderDates() {
+      const wrap = document.getElementById('dates');
+      wrap.innerHTML = '';
+      (manifest.days || []).forEach(d => {
+        const div = document.createElement('div');
+        div.className = 'date-item' + (selectedDate === d.day ? ' active' : '');
+        div.textContent = d.day;
+        div.onclick = () => selectDate(d.day);
+        wrap.appendChild(div);
+      });
+    }
+
+    async function selectDate(day) {
+      selectedDate = day;
+      renderDates();
+      const res = await fetch(`daily/${day}.md`, { cache: 'no-store' });
+      const md = await res.text();
+      const html = marked.parse(md);
+      const container = document.getElementById('md');
+      container.innerHTML = html;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const container = document.getElementById('md');
+      const h2s = container.querySelectorAll('h2');
+      h2s.forEach(h2 => {
+        const sec = h2.textContent.trim();
+        const show = activeSections.has(sec);
+        h2.style.display = show ? '' : 'none';
+        // hide until next section
+        let el = h2.nextElementSibling;
+        while (el && el.tagName !== 'H2') {
+          el.style.display = show ? '' : 'none';
+          el = el.nextElementSibling;
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderChips();
+      loadManifest();
+      document.getElementById('refresh').onclick = () => loadManifest();
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Personal Strategic News Intelligence</h1>
+  </header>
+  <main>
+    <aside>
+      <div class="section">
+        <h2>Filters</h2>
+        <div id="chips" class="chips"></div>
+      </div>
+      <div class="section">
+        <h2>Dates</h2>
+        <div id="dates" class="dates"></div>
+        <div class="muted" style="margin-top:8px;">
+          Click a date to load its brief.
+          <button id="refresh" class="chip" style="margin-top:8px;">Refresh</button>
+        </div>
+      </div>
+    </aside>
+    <section class="content">
+      <div id="md" class="md"></div>
+    </section>
+  </main>
+</body>
+</html>
+
