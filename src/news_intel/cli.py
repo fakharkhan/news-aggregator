@@ -5,6 +5,10 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import List, Tuple
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import typer
 from rich.console import Console
 from rich.table import Table
